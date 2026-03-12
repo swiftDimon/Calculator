@@ -9,12 +9,30 @@ import SwiftUI
 
 struct ContentView: View {
     @State var result: String = ""
+    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    let mainButtons: [[CalculatorButton]] = [
+        [.clear, .squareRoot, .exponent, .divide],
+        [.seven, .eight, .nine, .multiply],
+        [.four, .five, .six, .subtract],
+        [.one, .two, .three, .add],
+        [.history, .zero, .decimal, .calculate]
+    ]
+    
     var body: some View {
-     
-            VStack{
-                textField
+        
+        VStack{
+            textField
+            ForEach(mainButtons, id: \.self) { row in
+                LazyVGrid(columns: columns) {
+                    ForEach(row, id: \.self){ button in
+                        calculatorButtonRepresentation(button)
+                    }
+                }
             }
-      
+            
+            
+        }
+        
     }
     
     var textField : some View {
@@ -31,6 +49,8 @@ struct ContentView: View {
             )
     }
 }
+
+
 
 #Preview {
     ContentView()
