@@ -8,33 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var text: String = "Hello, world!"
+    @State var result: String = ""
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text(text)
-        }
-        .padding()
-        buttonEditText // ad this one
-        Spacer()
-        
+     
+            VStack{
+                textField
+            }
+      
     }
-    var buttonEditText: some View { //add button here
-        Button {
-            text = "Good bye world!"
-        } label: {
-            RoundedRectangle(cornerRadius: 10)
-                .frame(width: 120, height: 60)
-                .foregroundColor(.blue)
-                .shadow(radius: 10)
-                
-                .overlay(
-                    Text("Good bye world!")
-                        .foregroundStyle(.white)
-                )
-        }
+    
+    var textField : some View {
+        Text(result)
+            .font(.headline)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: 50,
+                alignment: .trailing)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.black, lineWidth: 1)
+            )
     }
 }
 
