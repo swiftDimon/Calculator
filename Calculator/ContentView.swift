@@ -22,6 +22,7 @@ struct ContentView: View {
         
         VStack{
             textField
+                .padding(.bottom)
             ForEach(mainButtons, id: \.self) { row in
                 LazyVGrid(columns: columns) {
                     ForEach(row, id: \.self){ button in

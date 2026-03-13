@@ -46,6 +46,18 @@ enum CalculatorButton: CaseIterable {
         }
         
     }
+    
+    var buttonColor : Color{
+        switch self {
+        case .zero, .one, .two, .three, .four, .five, .six, .seven, .eight, .nine , .decimal:
+            return Color(.systemGray)
+        case .add ,.divide ,.multiply ,.subtract, .calculate:
+            return Color(.systemBlue)
+        default:
+            return Color(.systemGray).opacity(0.5)
+            
+        }
+    }
     @ViewBuilder
     var labelView: some View {
         switch self {
@@ -77,7 +89,7 @@ func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding
         button.labelView
             .font(.title)
             .frame(width: 80, height: 80)
-            .background(Color.orange)
+            .background(button.buttonColor)
             .foregroundColor(Color.white)
             .clipShape(Circle())
     }
