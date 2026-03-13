@@ -20,7 +20,7 @@ enum CalculatorButton: CaseIterable {
         case .exponent: return "xⁿ"
         case .divide: return "÷"
         case .multiply: return "×"
-        case .subtract: return "−"
+        case .subtract: return "-"
         case .add: return "+"
         case .calculate: return "="
         case .decimal: return ","
@@ -45,6 +45,19 @@ enum CalculatorButton: CaseIterable {
             return false
         }
         
+    }
+    
+    var operation : String{
+        switch self{
+        case .add  ,.subtract:
+            return self.title
+        case .divide:
+            return "/"
+        case .multiply:
+            return "*"
+        default:
+            return ""
+        }
     }
     
     var buttonColor : Color{
@@ -102,24 +115,20 @@ func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding
 ///   - currentInput: binding a text which we want to change
 func calculatorDidTap(button: CalculatorButton, currentInput: Binding<String>){
     
-    if button.isNumber{
-        currentInput.wrappedValue += "\(button.title)"
-    } else{
-        switch button {
-        case  .divide:
-            currentInput.wrappedValue += "/"
-        case .multiply:
-            currentInput.wrappedValue += "*"
-        case .subtract:
-            currentInput.wrappedValue += "-"
-        case .add:
-            currentInput.wrappedValue += "+"
-        case .decimal:
-            currentInput.wrappedValue += ","
-        case .clear:
-            currentInput.wrappedValue = ""
-        default :
-            currentInput.wrappedValue = "none"
+    if button.isNumber {
+            currentInput.wrappedValue += button.title
+        } else if !button.operation.isEmpty {
+            currentInput.wrappedValue += button.operation
+        } else {
+            switch button {
+            case .decimal:
+                currentInput.wrappedValue += ","
+            case .clear:
+                currentInput.wrappedValue = ""
+            default:
+                currentInput.wrappedValue = "none"
+            }
         }
-    }
+        
+    
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var result: String = ""
+
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     let mainButtons: [[CalculatorButton]] = [
         [.clear, .squareRoot, .exponent, .divide],
@@ -20,7 +21,7 @@ struct ContentView: View {
     
     var body: some View {
         
-        VStack{
+        VStack(){
             textField
                 .padding(.bottom)
             ForEach(mainButtons, id: \.self) { row in
