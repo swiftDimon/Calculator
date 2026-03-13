@@ -25,7 +25,7 @@ struct ContentView: View {
             ForEach(mainButtons, id: \.self) { row in
                 LazyVGrid(columns: columns) {
                     ForEach(row, id: \.self){ button in
-                        calculatorButtonRepresentation(button)
+                        calculatorButtonRepresentation(button: button , textField: $result)
                     }
                 }
             }
