@@ -44,7 +44,7 @@ enum CalculatorButton: CaseIterable {
         default :
             return false
         }
-   
+        
     }
     @ViewBuilder
     var labelView: some View {
@@ -92,5 +92,22 @@ func calculatorDidTap(button: CalculatorButton, currentInput: Binding<String>){
     
     if button.isNumber{
         currentInput.wrappedValue += "\(button.title)"
+    } else{
+        switch button {
+        case  .divide:
+            currentInput.wrappedValue += "/"
+        case .multiply:
+            currentInput.wrappedValue += "*"
+        case .subtract:
+            currentInput.wrappedValue += "-"
+        case .add:
+            currentInput.wrappedValue += "+"
+        case .decimal:
+            currentInput.wrappedValue += ","
+        case .clear:
+            currentInput.wrappedValue = ""
+        default :
+            currentInput.wrappedValue = "none"
+        }
     }
 }
