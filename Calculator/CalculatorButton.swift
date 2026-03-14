@@ -124,10 +124,19 @@ func calculatorDidTap(button: CalculatorButton,
         currentInput.wrappedValue += button.title
         print (previousInput)
     } else if !button.operation.isEmpty {
-        previousInput.wrappedValue = currentInput.wrappedValue
-        activeOperation.wrappedValue = button.operation
-        currentInput.wrappedValue = ""
+        if activeOperation.wrappedValue == button.operation { // Check is operator the same,to avoid add *** or ///
+            return
+        }else {
+            if activeOperation.wrappedValue == "" { //Works for first press on any operation button and saves previous number
+                previousInput.wrappedValue = currentInput.wrappedValue
+                activeOperation.wrappedValue = button.operation
+                currentInput.wrappedValue = ""
+            }else { //works when action button already exists and change it
+                activeOperation.wrappedValue = button.operation
+            }
+        }
     } else {
+        print ("Not gg")
         switch button {
         case .decimal:
             currentInput.wrappedValue += ","
@@ -162,4 +171,5 @@ func calculatorDidTap(button: CalculatorButton,
             currentInput.wrappedValue = "none"
         } // switch button end
     } //else end
+    print ("return func end")
 }// calculatorDidTap end
