@@ -94,10 +94,10 @@ enum CalculatorButton: CaseIterable {
 ///   - button: our element  from CalculatorButton enum
 ///   - textField: Text field of our Calculator
 /// - Returns: Button with style and logic inside and
-func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding<String> , previousInput: Binding<String> , activeOperation: Binding<String> , result: Binding<Double>) -> some View {
+func calculatorButtonRepresentation(button: CalculatorButton, action : @escaping () -> Void) -> some View {
     Button(action: {
         print("Tapped on: \(button)")
-        calculatorDidTap(button : button, currentInput: textField ,previousInput: previousInput,activeOperation: activeOperation , result : result)// Func which changes textField
+        action()
     }) {
         button.labelView
             .font(.title)

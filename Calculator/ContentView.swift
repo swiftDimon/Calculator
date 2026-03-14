@@ -30,7 +30,16 @@ struct ContentView: View {
             ForEach(mainButtons, id: \.self) { row in
                 LazyVGrid(columns: columns) {
                     ForEach(row, id: \.self){ button in
-                        calculatorButtonRepresentation(button: button , textField: $currentInput , previousInput: $previousInput , activeOperation: $activeOperator , result : $result)
+                        calculatorButtonRepresentation(
+                            button: button,
+                            action: {
+                                calculatorDidTap(button: button,
+                                                 currentInput: $currentInput,
+                                                 previousInput: $previousInput,
+                                                 activeOperation: $activeOperator,
+                                                 result: $result)
+                            }
+                        )
                     }
                 }
             }
