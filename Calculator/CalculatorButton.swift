@@ -94,10 +94,10 @@ enum CalculatorButton: CaseIterable {
 ///   - button: our element  from CalculatorButton enum
 ///   - textField: Text field of our Calculator
 /// - Returns: Button with style and logic inside and
-func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding<String>) -> some View {
+func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding<String> , previousInput: Binding<String> , activeOperation: Binding<String> , result: Binding<Double>) -> some View {
     Button(action: {
         print("Tapped on: \(button)")
-        calculatorDidTap(button : button, currentInput: textField)// Func which changes textField
+        calculatorDidTap(button : button, currentInput: textField ,previousInput: previousInput,activeOperation: activeOperation , result : result)// Func which changes textField
     }) {
         button.labelView
             .font(.title)
@@ -113,22 +113,42 @@ func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding
 /// - Parameters:
 ///   - button: button that we pressed from CalculatorButton enum
 ///   - currentInput: binding a text which we want to change
-func calculatorDidTap(button: CalculatorButton, currentInput: Binding<String>){
+func calculatorDidTap(button: CalculatorButton, currentInput: Binding<String> , previousInput: Binding<String> , activeOperation: Binding<String> , result: Binding<Double>){
     
     if button.isNumber {
-            currentInput.wrappedValue += button.title
-        } else if !button.operation.isEmpty {
-            currentInput.wrappedValue += button.operation
-        } else {
-            switch button {
-            case .decimal:
-                currentInput.wrappedValue += ","
-            case .clear:
-                currentInput.wrappedValue = ""
+        currentInput.wrappedValue += button.title
+        print (previousInput)
+    } else if !button.operation.isEmpty {
+        previousInput.wrappedValue = currentInput.wrappedValue //33
+        activeOperation.wrappedValue = button.operation
+        currentInput.wrappedValue = ""
+    } else {
+        switch button {
+        case .decimal:
+            currentInput.wrappedValue += ","
+        case .clear:
+            currentInput.wrappedValue = ""
+        case .calculate:
+            let num1 = Double(previousInput.wrappedValue) ?? 0
+            let num2 = Double(currentInput.wrappedValue) ?? 0
+            print("num1 is: \(num1)")
+            print("num2 is: \(num2)")
+            switch activeOperation.wrappedValue {
+            case "+":
+                result.wrappedValue = num1 + num2
+            case "-":
+                result.wrappedValue  = num1 - num2
+            case "*":
+                result.wrappedValue  = num1 * num2
+            case "/":
+                result.wrappedValue  = num1 / num2
             default:
-                currentInput.wrappedValue = "none"
+                result.wrappedValue  = 0
             }
+        default:
+            currentInput.wrappedValue = "none"
         }
-        
+    }
+    
     
 }

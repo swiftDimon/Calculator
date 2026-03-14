@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var result: String = ""
-
+    @State var result : Double = 0
+    @State var currentInput: String = ""
+    @State var previousInput: String = ""
+    @State var activeOperator: String = ""
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     let mainButtons: [[CalculatorButton]] = [
         [.clear, .squareRoot, .exponent, .divide],
@@ -22,12 +24,13 @@ struct ContentView: View {
     var body: some View {
         
         VStack(){
+            resultField
             textField
                 .padding(.bottom)
             ForEach(mainButtons, id: \.self) { row in
                 LazyVGrid(columns: columns) {
                     ForEach(row, id: \.self){ button in
-                        calculatorButtonRepresentation(button: button , textField: $result)
+                        calculatorButtonRepresentation(button: button , textField: $currentInput , previousInput: $previousInput , activeOperation: $activeOperator , result : $result)
                     }
                 }
             }
@@ -36,9 +39,16 @@ struct ContentView: View {
         }
         
     }
-    
+    var resultField : some View {
+        Text("\(result)")
+            .font(.largeTitle)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: 100,
+            )
+    }
     var textField : some View {
-        Text(result)
+        Text("\(activeOperator) \(currentInput)  ")
             .font(.headline)
             .frame(
                 maxWidth: .infinity,
@@ -57,3 +67,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
