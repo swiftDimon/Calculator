@@ -113,7 +113,11 @@ func calculatorButtonRepresentation(button: CalculatorButton, textField: Binding
 /// - Parameters:
 ///   - button: button that we pressed from CalculatorButton enum
 ///   - currentInput: binding a text which we want to change
-func calculatorDidTap(button: CalculatorButton, currentInput: Binding<String> , previousInput: Binding<String> , activeOperation: Binding<String> , result: Binding<Double>){
+func calculatorDidTap(button: CalculatorButton,
+                      currentInput: Binding<String> ,
+                      previousInput: Binding<String> ,
+                      activeOperation: Binding<String> ,
+                      result: Binding<Double>){
     
     if button.isNumber {
         currentInput.wrappedValue += button.title
@@ -128,6 +132,9 @@ func calculatorDidTap(button: CalculatorButton, currentInput: Binding<String> , 
             currentInput.wrappedValue += ","
         case .clear:
             currentInput.wrappedValue = ""
+            result.wrappedValue = 0
+            activeOperation.wrappedValue = ""
+            previousInput.wrappedValue = ""
         case .calculate:
             let num1 = Double(previousInput.wrappedValue) ?? 0
             let num2 = Double(currentInput.wrappedValue) ?? 0
