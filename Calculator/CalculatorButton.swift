@@ -35,7 +35,7 @@ enum CalculatorButton: CaseIterable {
         case .eight: return "8"
         case .nine: return "9"
         }
-    } // End Title
+    } // Title end
     
     var isNumber : Bool { //adding to group and easy work in didTap
         switch self {
@@ -71,6 +71,7 @@ enum CalculatorButton: CaseIterable {
             
         }
     }
+    
     @ViewBuilder
     var labelView: some View {
         switch self {
@@ -87,7 +88,7 @@ enum CalculatorButton: CaseIterable {
     
     
     
-}
+}// Enum end
 
 /// Show buttons function
 /// - Parameters:
@@ -123,7 +124,7 @@ func calculatorDidTap(button: CalculatorButton,
         currentInput.wrappedValue += button.title
         print (previousInput)
     } else if !button.operation.isEmpty {
-        previousInput.wrappedValue = currentInput.wrappedValue //33
+        previousInput.wrappedValue = currentInput.wrappedValue
         activeOperation.wrappedValue = button.operation
         currentInput.wrappedValue = ""
     } else {
@@ -152,10 +153,13 @@ func calculatorDidTap(button: CalculatorButton,
             default:
                 result.wrappedValue  = 0
             }
+            //Reset the values
+            currentInput.wrappedValue = ""
+            activeOperation.wrappedValue = ""
+            previousInput.wrappedValue = ""
+            previousInput.wrappedValue = currentInput.wrappedValue
         default:
             currentInput.wrappedValue = "none"
-        }
-    }
-    
-    
-}
+        } // switch button end
+    } //else end
+}// calculatorDidTap end
