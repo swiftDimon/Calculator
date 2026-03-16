@@ -49,7 +49,7 @@ enum CalculatorButton: CaseIterable {
     
     var operation : String{
         switch self{
-        case .add  ,.subtract:
+        case .add  ,.subtract ,.exponent:
             return self.title
         case .divide:
             return "/"
@@ -139,7 +139,7 @@ func calculatorDidTap(button: CalculatorButton,
         print ("Not gg")
         switch button {
         case .decimal:
-            currentInput.wrappedValue += ","
+            currentInput.wrappedValue += "."
         case .clear:
             currentInput.wrappedValue = ""
             result.wrappedValue = 0
@@ -151,6 +151,8 @@ func calculatorDidTap(button: CalculatorButton,
             print("num1 is: \(num1)")
             print("num2 is: \(num2)")
             switch activeOperation.wrappedValue {
+                case "xⁿ":
+                result.wrappedValue = pow(num1, num2)
             case "+":
                 result.wrappedValue = num1 + num2
             case "-":
@@ -173,3 +175,4 @@ func calculatorDidTap(button: CalculatorButton,
     } //else end
     print ("return func end")
 }// calculatorDidTap end
+
