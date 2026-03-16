@@ -145,6 +145,9 @@ func calculatorDidTap(button: CalculatorButton,
             result.wrappedValue = 0
             activeOperation.wrappedValue = ""
             previousInput.wrappedValue = ""
+        case .squareRoot:
+            activeOperation.wrappedValue = "√"
+            currentInput.wrappedValue = ""
         case .calculate:
             let num1 = Double(previousInput.wrappedValue) ?? 0
             let num2 = Double(currentInput.wrappedValue) ?? 0
@@ -153,6 +156,8 @@ func calculatorDidTap(button: CalculatorButton,
             switch activeOperation.wrappedValue {
                 case "xⁿ":
                 result.wrappedValue = pow(num1, num2)
+            case "√":
+                result.wrappedValue = sqrt(num2)
             case "+":
                 result.wrappedValue = num1 + num2
             case "-":
