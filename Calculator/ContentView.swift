@@ -9,9 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State var result : Double = 0
-    @State var currentInput: String = ""
-    @State var previousInput: String = ""
     @State var activeOperator: String = ""
+    @State var expression : String = ""
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     let mainButtons: [[CalculatorButton]] = [
         [.clear, .squareRoot, .exponent, .divide],
@@ -34,10 +33,9 @@ struct ContentView: View {
                             button: button,
                             action: {
                                 calculatorDidTap(button: button,
-                                                 currentInput: $currentInput,
-                                                 previousInput: $previousInput,
                                                  activeOperation: $activeOperator,
-                                                 result: $result)
+                                                 result: $result,
+                                                 expression: $expression)
                             }
                         )
                     }
@@ -57,7 +55,8 @@ struct ContentView: View {
             )
     }
     var textField : some View {
-        Text("\(activeOperator) \(currentInput)  ")
+//        Text("\(activeOperator) \(currentInput)  ")
+        Text(expression)
             .font(.headline)
             .frame(
                 maxWidth: .infinity,

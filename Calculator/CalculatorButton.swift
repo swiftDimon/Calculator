@@ -49,12 +49,10 @@ enum CalculatorButton: CaseIterable {
     
     var operation : String{
         switch self{
-        case .add  ,.subtract ,.exponent:
+        case .add  ,.subtract , .divide ,.multiply:
             return self.title
-        case .divide:
-            return "/"
-        case .multiply:
-            return "*"
+        case .exponent:
+            return "ⁿ"
         default:
             return ""
         }
@@ -115,69 +113,49 @@ func calculatorButtonRepresentation(button: CalculatorButton, action : @escaping
 ///   - button: button that we pressed from CalculatorButton enum
 ///   - currentInput: binding a text which we want to change
 func calculatorDidTap(button: CalculatorButton,
-                      currentInput: Binding<String> ,
-                      previousInput: Binding<String> ,
                       activeOperation: Binding<String> ,
-                      result: Binding<Double>){
-    
+                      result: Binding<Double>,
+                      expression: Binding<String>
+){
+    let lastChar = expression.wrappedValue.last ?? " "
     if button.isNumber {
-        currentInput.wrappedValue += button.title
-        print (previousInput)
-    } else if !button.operation.isEmpty {
-        if activeOperation.wrappedValue == button.operation { // Check is operator the same,to avoid add *** or ///
-            return
-        }else {
-            if activeOperation.wrappedValue == "" { //Works for first press on any operation button and saves previous number
-                previousInput.wrappedValue = currentInput.wrappedValue
-                activeOperation.wrappedValue = button.operation
-                currentInput.wrappedValue = ""
-            }else { //works when action button already exists and change it
-                activeOperation.wrappedValue = button.operation
-            }
+        expression.wrappedValue += button.title
+    } else if !button.operation.isEmpty{
+        if "÷×+-xⁿ".contains(lastChar){
+            expression.wrappedValue.removeLast()
+            expression.wrappedValue += button.operation
+        } else {
+            expression.wrappedValue += button.operation
         }
-    } else {
+    }else {
         print ("Not gg")
         switch button {
         case .decimal:
-            currentInput.wrappedValue += "."
+            expression.wrappedValue += "."
         case .clear:
-            currentInput.wrappedValue = ""
             result.wrappedValue = 0
             activeOperation.wrappedValue = ""
-            previousInput.wrappedValue = ""
+            expression.wrappedValue = ""
         case .squareRoot:
             activeOperation.wrappedValue = "√"
-            currentInput.wrappedValue = ""
-        case .calculate:
-            let num1 = Double(previousInput.wrappedValue) ?? 0
-            let num2 = Double(currentInput.wrappedValue) ?? 0
-            print("num1 is: \(num1)")
-            print("num2 is: \(num2)")
-            switch activeOperation.wrappedValue {
-                case "xⁿ":
-                result.wrappedValue = pow(num1, num2)
-            case "√":
-                result.wrappedValue = sqrt(num2)
-            case "+":
-                result.wrappedValue = num1 + num2
-            case "-":
-                result.wrappedValue  = num1 - num2
-            case "*":
-                result.wrappedValue  = num1 * num2
-            case "/":
-                result.wrappedValue  = num1 / num2
-            default:
-                result.wrappedValue  = 0
-            }
-            //Reset the values
-            currentInput.wrappedValue = ""
-            activeOperation.wrappedValue = ""
-            previousInput.wrappedValue = ""
-            previousInput.wrappedValue = currentInput.wrappedValue
+            expression.wrappedValue = ""
+        case.calculate:
+            expression.wrappedValue = calculateExpression(expression)
         default:
-            currentInput.wrappedValue = "none"
+            expression.wrappedValue = "none"
         } // switch button end
     } //else end
-    print ("return func end")
 }// calculatorDidTap end
 
+/// Return result from expression string
+/// - Parameter input: Our string with operations and numbers
+/// - Returns: result of expression
+func calculateExpression (_ input: Binding<String>) -> String{
+    let swapSymbols = input.wrappedValue.replacingOccurrences(of: "÷", with: "/")
+        .replacingOccurrences(of: "×", with: "*")           //change symbols ,to work with
+    let expression = NSExpression(format: swapSymbols)
+    if let result = expression.expressionValue(with: nil, context: nil) as? Double {
+        return String(format: "%g",result)
+    }
+    return "Erorr"
+}
