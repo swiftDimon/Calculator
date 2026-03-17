@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State var result : String = "0"
     @State var activeOperator: String = ""
-    @State var expression : String = ""
+    @State var expression : String = "0"
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     let mainButtons: [[CalculatorButton]] = [
         [.clear, .squareRoot, .exponent, .divide],

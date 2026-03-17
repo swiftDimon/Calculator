@@ -119,7 +119,11 @@ func calculatorDidTap(button: CalculatorButton,
 ){
     let lastChar = expression.wrappedValue.last ?? " "
     if button.isNumber {
-        expression.wrappedValue += button.title
+        if expression.wrappedValue == "0"{
+            expression.wrappedValue = button.title
+        }else {
+            expression.wrappedValue += button.title
+        }
     } else if !button.operation.isEmpty{
         if "÷×+-xⁿ".contains(lastChar){
             expression.wrappedValue.removeLast()
@@ -135,7 +139,7 @@ func calculatorDidTap(button: CalculatorButton,
         case .clear:
             result.wrappedValue = "0"
             activeOperation.wrappedValue = ""
-            expression.wrappedValue = ""
+            expression.wrappedValue = "0"
         case .squareRoot:
             activeOperation.wrappedValue = "√"
             expression.wrappedValue = ""
@@ -148,9 +152,7 @@ func calculatorDidTap(button: CalculatorButton,
         } // switch button end
     } //else end
     
-    if !expression.wrappedValue.isEmpty {
-        try? result.wrappedValue = calculateExpression(expression)
-    }
+    if let liveResult = try? calculateExpression(expression) { result.wrappedValue = liveResult}
 
 }// calculatorDidTap end
 
