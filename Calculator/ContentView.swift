@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var result : Double = 0
+    @State var result : String = "0"
     @State var activeOperator: String = ""
     @State var expression : String = ""
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]

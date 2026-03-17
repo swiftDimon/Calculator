@@ -114,7 +114,7 @@ func calculatorButtonRepresentation(button: CalculatorButton, action : @escaping
 ///   - currentInput: binding a text which we want to change
 func calculatorDidTap(button: CalculatorButton,
                       activeOperation: Binding<String> ,
-                      result: Binding<Double>,
+                      result: Binding<String>,
                       expression: Binding<String>
 ){
     let lastChar = expression.wrappedValue.last ?? " "
@@ -133,29 +133,55 @@ func calculatorDidTap(button: CalculatorButton,
         case .decimal:
             expression.wrappedValue += "."
         case .clear:
-            result.wrappedValue = 0
+            result.wrappedValue = "0"
             activeOperation.wrappedValue = ""
             expression.wrappedValue = ""
         case .squareRoot:
             activeOperation.wrappedValue = "√"
             expression.wrappedValue = ""
         case.calculate:
-            expression.wrappedValue = calculateExpression(expression)
+           try? expression.wrappedValue = calculateExpression(expression)
+            return
         default:
             expression.wrappedValue = "none"
+            
         } // switch button end
     } //else end
+    
+    if !expression.wrappedValue.isEmpty {
+        try? result.wrappedValue = calculateExpression(expression)
+    }
+
 }// calculatorDidTap end
 
 /// Return result from expression string
 /// - Parameter input: Our string with operations and numbers
 /// - Returns: result of expression
-func calculateExpression (_ input: Binding<String>) -> String{
-    let swapSymbols = input.wrappedValue.replacingOccurrences(of: "÷", with: "/")
-        .replacingOccurrences(of: "×", with: "*")           //change symbols ,to work with
-    let expression = NSExpression(format: swapSymbols)
-    if let result = expression.expressionValue(with: nil, context: nil) as? Double {
-        return String(format: "%g",result)
+func calculateExpression (_ input: Binding<String>) throws -> String{
+    do {
+        var formula = input.wrappedValue
+        guard !formula.isEmpty else { throw CalculatorError.noNumberEntered }
+        while let last = formula.last, "÷×+-xⁿ".contains(last) { // remove last operation symbol
+            formula.removeLast()
+        }
+        let swapSymbols = formula.replacingOccurrences(of: "÷", with: "/")
+            .replacingOccurrences(of: "×", with: "*")           //change symbols ,to work with
+        
+        let expression = NSExpression(format: swapSymbols)
+        
+        guard let result = expression.expressionValue(with: nil, context: nil) as? Double else { throw CalculatorError.invalidCharacters }
+            return String(format: "%g",result)
+    } catch CalculatorError.noNumberEntered{
+        return "no numbers"
+    }catch CalculatorError.invalidCharacters{
+        return "Character error"
+    }catch {
+        return "Unexpected error"
     }
-    return "Erorr"
+}
+
+enum CalculatorError: Error {
+//    case divisionByZero
+    case invalidCharacters
+    case noNumberEntered
 }
