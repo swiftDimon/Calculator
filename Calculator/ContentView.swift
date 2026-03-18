@@ -55,7 +55,7 @@ struct ContentView: View {
             )
     }
     var textField : some View {
-//        Text("\(activeOperator) \(currentInput)  ")
+        //        Text("\(activeOperator) \(currentInput)  ")
         Text(expression)
             .font(.headline)
             .frame(
@@ -68,7 +68,7 @@ struct ContentView: View {
                     .stroke(Color.black, lineWidth: 1)
             )
     }
-}
+}// ContentView end
 
 
 

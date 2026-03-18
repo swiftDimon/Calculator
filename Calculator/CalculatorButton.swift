@@ -107,7 +107,9 @@ func calculatorButtonRepresentation(button: CalculatorButton, action : @escaping
     }
 }
 
-
+struct CalcTask { // Struct for making Live result with animation
+    static var pendingWork: DispatchWorkItem?
+}
 /// //Change textField by press.Logic of our button
 /// - Parameters:
 ///   - button: button that we pressed from CalculatorButton enum
@@ -144,6 +146,7 @@ func calculatorDidTap(button: CalculatorButton,
             activeOperation.wrappedValue = "√"
             expression.wrappedValue = ""
         case.calculate:
+            CalcTask.pendingWork?.cancel()
            try? expression.wrappedValue = calculateExpression(expression)
             return
         default:
@@ -152,7 +155,25 @@ func calculatorDidTap(button: CalculatorButton,
         } // switch button end
     } //else end
     
-    if let liveResult = try? calculateExpression(expression) { result.wrappedValue = liveResult}
+    // --- 2. THE DELAY LOGIC ---
+        
+        // Cancel any previous timer because the user just tapped a button
+        CalcTask.pendingWork?.cancel()
+        
+        // Create a new timer
+        let workItem = DispatchWorkItem {
+            if let liveResult = try? calculateExpression(expression) {
+                // Check if user hasn't typed anything else during the 1-second wait
+                // This ensures we don't overwrite with an old calculation
+                DispatchQueue.main.async {
+                    result.wrappedValue = liveResult
+                }
+            }
+        }
+        
+        // Store and execute after 1 second
+        CalcTask.pendingWork = workItem
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
 
 }// calculatorDidTap end
 
@@ -163,7 +184,7 @@ func calculateExpression (_ input: Binding<String>) throws -> String{
     do {
         var formula = input.wrappedValue
         guard !formula.isEmpty else { throw CalculatorError.noNumberEntered }
-        while let last = formula.last, "÷×+-xⁿ".contains(last) { // remove last operation symbol
+        while let last = formula.last, "÷×+-xⁿ.".contains(last) { // remove last operation symbol
             formula.removeLast()
         }
         let swapSymbols = formula.replacingOccurrences(of: "÷", with: "/")
