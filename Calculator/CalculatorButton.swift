@@ -123,7 +123,10 @@ func calculatorDidTap(button: CalculatorButton,
     if button.isNumber {
         if expression.wrappedValue == "0"{
             expression.wrappedValue = button.title
-        }else {
+        }else if lastChar == "ⁿ" || "⁰¹²³⁴⁵⁶⁷⁸⁹".contains(lastChar){ // logic for exponent
+            expression.wrappedValue += convertToSubscript(button.title)
+        }
+        else {
             expression.wrappedValue += button.title
         }
     } else if !button.operation.isEmpty{
@@ -137,14 +140,15 @@ func calculatorDidTap(button: CalculatorButton,
         print ("Not gg")
         switch button {
         case .decimal:
-            expression.wrappedValue += "."
+            if lastChar != "." {
+                expression.wrappedValue += "."
+            }
         case .clear:
             result.wrappedValue = "0"
             activeOperation.wrappedValue = ""
             expression.wrappedValue = "0"
         case .squareRoot:
             activeOperation.wrappedValue = "√"
-            expression.wrappedValue = ""
         case.calculate:
             CalcTask.pendingWork?.cancel()
            try? expression.wrappedValue = calculateExpression(expression)
@@ -183,12 +187,17 @@ func calculatorDidTap(button: CalculatorButton,
 func calculateExpression (_ input: Binding<String>) throws -> String{
     do {
         var formula = input.wrappedValue
+        let subsripts = ["⁰":"0", "¹":"1", "²":"2", "³":"3", "⁴":"4", "⁵":"5", "⁶":"6", "⁷":"7", "⁸":"8", "⁹":"9"]
+        for (key,value) in subsripts {
+            formula = formula.replacingOccurrences(of: key, with: value)
+        }
         guard !formula.isEmpty else { throw CalculatorError.noNumberEntered }
-        while let last = formula.last, "÷×+-xⁿ.".contains(last) { // remove last operation symbol
+        while let last = formula.last, "÷×+-ⁿ.".contains(last) { // remove last operation symbol
             formula.removeLast()
         }
-        let swapSymbols = formula.replacingOccurrences(of: "÷", with: "/")
-            .replacingOccurrences(of: "×", with: "*")           //change symbols ,to work with
+        let swapSymbols = formula.replacingOccurrences(of: "÷", with: "/") //change symbols ,to work with
+            .replacingOccurrences(of: "×", with: "*")
+            .replacingOccurrences(of: "ⁿ", with: "**")
         
         let expression = NSExpression(format: swapSymbols)
         
@@ -207,4 +216,16 @@ enum CalculatorError: Error {
 //    case divisionByZero
     case invalidCharacters
     case noNumberEntered
+}
+
+func convertToSubscript(_ input: String) -> String{ // Support function to convert for Exponent
+    let subsripts = ["⁰":"0", "¹":"1", "²":"2", "³":"3", "⁴":"4", "⁵":"5", "⁶":"6", "⁷":"7", "⁸":"8", "⁹":"9"]
+    var result = ""
+    for (key, value) in subsripts {
+        if value == input{
+            result = key
+            break
+        }
+    }
+    return result
 }
