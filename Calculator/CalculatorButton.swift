@@ -10,7 +10,7 @@ import SwiftUI
 
 enum CalculatorButton: CaseIterable {
     case clear, history, squareRoot, exponent, divide, multiply, subtract, add, calculate, decimal
-    case zero, one, two, three, four, five, six, seven, eight, nine
+    case zero, one, two, three, four, five, six, seven, eight, nine ,openBracket ,closeBracket
     
     var title: String {
         switch self {
@@ -34,6 +34,8 @@ enum CalculatorButton: CaseIterable {
         case .seven: return "7"
         case .eight: return "8"
         case .nine: return "9"
+        case .openBracket: return "("
+        case .closeBracket: return ")"
         }
     } // Title end
     
@@ -148,10 +150,26 @@ func calculatorDidTap(button: CalculatorButton,
             activeOperation.wrappedValue = ""
             expression.wrappedValue = "0"
         case .squareRoot:
-            activeOperation.wrappedValue = "√"
+            if expression.wrappedValue == "0"{
+                expression.wrappedValue = "√("
+            }else {
+                expression.wrappedValue += "√("
+            }
+        case.openBracket:
+            if expression.wrappedValue == "0"{
+                expression.wrappedValue = "("
+            }else {
+                expression.wrappedValue += "("
+            }
+        case .closeBracket:
+            if expression.wrappedValue == "0"{
+                expression.wrappedValue = ")"
+            }else {
+                expression.wrappedValue += ")"
+            }
         case.calculate:
             CalcTask.pendingWork?.cancel()
-           try? expression.wrappedValue = calculateExpression(expression)
+            try? expression.wrappedValue = calculateExpression(expression)
             return
         default:
             expression.wrappedValue = "none"
@@ -159,26 +177,26 @@ func calculatorDidTap(button: CalculatorButton,
         } // switch button end
     } //else end
     
-    // --- 2. THE DELAY LOGIC ---
-        
-        // Cancel any previous timer because the user just tapped a button
-        CalcTask.pendingWork?.cancel()
-        
-        // Create a new timer
-        let workItem = DispatchWorkItem {
-            if let liveResult = try? calculateExpression(expression) {
-                // Check if user hasn't typed anything else during the 1-second wait
-                // This ensures we don't overwrite with an old calculation
-                DispatchQueue.main.async {
-                    result.wrappedValue = liveResult
+        // --- 2. THE DELAY LOGIC ---
+    
+            // Cancel any previous timer because the user just tapped a button
+            CalcTask.pendingWork?.cancel()
+    
+            // Create a new timer
+            let workItem = DispatchWorkItem {
+                if let liveResult = try? calculateExpression(expression) {
+                    // Check if user hasn't typed anything else during the 1-second wait
+                    // This ensures we don't overwrite with an old calculation
+                    DispatchQueue.main.async {
+                        result.wrappedValue = liveResult
+                    }
                 }
             }
-        }
-        
-        // Store and execute after 1 second
-        CalcTask.pendingWork = workItem
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
-
+    
+            // Store and execute after 1 second
+            CalcTask.pendingWork = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
+    
 }// calculatorDidTap end
 
 /// Return result from expression string
@@ -187,22 +205,42 @@ func calculatorDidTap(button: CalculatorButton,
 func calculateExpression (_ input: Binding<String>) throws -> String{
     do {
         var formula = input.wrappedValue
+        let lastchar = formula.last ?? " "
+        guard !formula.isEmpty else { throw CalculatorError.noNumberEntered }
+        //Subsribts
         let subsripts = ["⁰":"0", "¹":"1", "²":"2", "³":"3", "⁴":"4", "⁵":"5", "⁶":"6", "⁷":"7", "⁸":"8", "⁹":"9"]
         for (key,value) in subsripts {
             formula = formula.replacingOccurrences(of: key, with: value)
+        }//Subsribts end
+        
+        guard lastchar != "(" else { return "0" }
+        //Brackets
+        let leftCount = formula.filter { $0 == "(" }.count
+        let rightCount = formula.filter { $0 == ")" }.count
+        
+        // Add missing closing brackets so it doesn't crash
+        if formula.contains("("){
+            if leftCount > rightCount && !("÷×+-ⁿ.".contains(lastchar)) {
+                formula += String(repeating: ")", count: leftCount - rightCount)
+            }else {
+                return "0"
+            }
         }
-        guard !formula.isEmpty else { throw CalculatorError.noNumberEntered }
+        
         while let last = formula.last, "÷×+-ⁿ.".contains(last) { // remove last operation symbol
             formula.removeLast()
         }
+        
+        
         let swapSymbols = formula.replacingOccurrences(of: "÷", with: "/") //change symbols ,to work with
             .replacingOccurrences(of: "×", with: "*")
             .replacingOccurrences(of: "ⁿ", with: "**")
+            .replacingOccurrences(of: "√", with: "sqrt")
         
         let expression = NSExpression(format: swapSymbols)
         
         guard let result = expression.expressionValue(with: nil, context: nil) as? Double else { throw CalculatorError.invalidCharacters }
-            return String(format: "%g",result)
+        return String(format: "%g",result)
     } catch CalculatorError.noNumberEntered{
         return "no numbers"
     }catch CalculatorError.invalidCharacters{
@@ -213,7 +251,7 @@ func calculateExpression (_ input: Binding<String>) throws -> String{
 }
 
 enum CalculatorError: Error {
-//    case divisionByZero
+    //    case divisionByZero
     case invalidCharacters
     case noNumberEntered
 }

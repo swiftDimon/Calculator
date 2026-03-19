@@ -17,7 +17,8 @@ struct ContentView: View {
         [.seven, .eight, .nine, .multiply],
         [.four, .five, .six, .subtract],
         [.one, .two, .three, .add],
-        [.history, .zero, .decimal, .calculate]
+        [.history, .zero, .decimal, .calculate],
+        [.openBracket, .closeBracket]
     ]
     
     var body: some View {
@@ -57,7 +58,7 @@ struct ContentView: View {
     var textField : some View {
         //        Text("\(activeOperator) \(currentInput)  ")
         Text(expression)
-            .font(.headline)
+            .font(.title)
             .frame(
                 maxWidth: .infinity,
                 maxHeight: 50,
